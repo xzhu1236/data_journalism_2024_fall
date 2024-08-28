@@ -25,11 +25,14 @@ The command to set a working directory is setwd(). For example, this sets the wo
 
 ```{r}
 setwd("~/jour472/data_journalism_2024_fall")
+
+getwd()
+
 ```
 
 ### How to install and load the tidyverse
 
 ```{r}
-install.packages("tidyverse")
+#install.packages("tidyverse")
 library(tidyverse)
 ```
