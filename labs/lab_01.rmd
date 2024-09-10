@@ -72,9 +72,9 @@ west_virginia_winred_contributions |>
 west_virginia_winred_contributions |>
   group_by(city) |>
   summarise(
-    count_contribs = -n()
+    count_contribs = n()
   ) |>
-  arrange(desc(count_contribs))
+  arrange(count_contribs)
 ```
 
 **Q4** What's your best educated guess to explain why the city identified in question 2 had more contributions compared to the cities identified in question 3? Hint: you won't find the answer in the data, you'll need to do some quick web research. You do not need to write any code for this question, so no codeblock is provided.
@@ -107,7 +107,7 @@ Store it as a variable object called `wv_summary` so that you can examine it wit
 **A7**.
 
 ```{r}
-west_virginia_winred_contributions |>
+wv_summary <- (west_virginia_winred_contributions |>
   group_by(memo_text) |>
   summarise(
     count_contribs = n(),
@@ -118,4 +118,5 @@ west_virginia_winred_contributions |>
     max_amount = max(amount)
   ) |>
   arrange(desc(total_amount))
+)
 ```
