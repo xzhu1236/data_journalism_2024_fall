@@ -36,3 +36,21 @@ getwd()
 #install.packages("tidyverse")
 library(tidyverse)
 ```
+
+Operators
+
+  |> continue
+  | or
+  & and
+  <- assign
+  = equals
+
+Functions
+
+  Pre-lab 2
+  
+  select() - allows you to show specific columns
+  str_to_upper - makes text uppercase
+  case_when - organizes into categories
+  nrow/ncolumn - gives the number of rows/columns
+  mdy() and its combinations - turns data into a date

@@ -120,3 +120,18 @@ wv_summary <- (west_virginia_winred_contributions |>
   arrange(desc(total_amount))
 )
 ```
+
+```{r}
+west_virginia_winred_contributions |>
+  filter(memo_text == 'Refund of Earmarked Contribution') |>
+  group_by(state) |>
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount),
+    min_amount = min(amount),
+    max_amount = max(amount)
+  ) |>
+  arrange(desc(total_amount))
+```
