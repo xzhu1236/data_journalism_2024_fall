@@ -41,12 +41,14 @@ Take a look at the data, getting familiar with what it contains. Most of the col
 **A1** I got a total of 17,099 people who resgistered. The county with the most registered voters is Montgomery. The county with the most population is Montgomery, which matches with the number of voters registered.
 
 ```{r}
-view_md_voter_county_24 <- (md_voters_2024 |>
-  group_by(COUNTY) |>
-  select(COUNTY, FIRSTNAME, LASTNAME, GENDER, PARTY, STATE_REGISTRATION_DATE, COUNTY_REGISTRATION_DATE) |>
+md_voters_2024 |>
   filter(COUNTY_REGISTRATION_DATE == STATE_REGISTRATION_DATE) |>
   filter(COUNTY_REGISTRATION_DATE >= "2024-7-21") |>
-  arrange(COUNTY))
+  group_by(COUNTY) |>
+  summarize(
+    total_amount = n()
+  ) |>
+  arrange(desc(total_amount))
 ```
 
 **Q2** A better question is whether the new voters you found in Q1 are an outlier compared to other weeks this year. Using the original dataframe with 2024 registrants, use `mutate()` and lubridate to produce week numbers from the COUNTY_REGISTRATION_DATE (Lubridate has a function that turns a date into a week number. Use that to answer this question). Save that to the original dataframe. Then calculate how many voters are in each week. Describe the distribution of voters groups in a sentence - are the weeks from July 21-August 7 different from the rest, and if so, how?
@@ -83,41 +85,23 @@ date_md_voters_24 |>
 **A4** The central region accounts for most and most new voters are Democrats.
 
 ```{r}
-region_md_voters_24 <- (md_voters_2024 |>
+md_voters_2024 |>
   mutate(
     REGION = case_when(
-      COUNTY == "Garrett" ~ "Western Maryland",
-      COUNTY == "Allegany" ~ "Western Maryland",
-      COUNTY == "Washington" ~ "Western Maryland",
-      COUNTY == "Frederick" ~ "Capital Region",
-      COUNTY == "Montgomery" ~ "Capital Region",
-      COUNTY == "Prince George's" ~ "Capital Region",
-      COUNTY == "Anne Arundel" ~ "Central Maryland",
-      COUNTY == "Baltimore City" ~ "Central Maryland",
-      COUNTY == "Anne Arundel" ~ "Central Maryland",
-      COUNTY == "Baltimore County" ~ "Central Maryland",
-      COUNTY == "Carroll" ~ "Central Maryland",
-      COUNTY == "Harford" ~ "Central Maryland",
-      COUNTY == "Howard" ~ "Central Maryland",
-      COUNTY == "Calvert" ~ "Southern Maryland",
-      COUNTY == "Charles" ~ "Southern Maryland",
-      COUNTY == "Saint Mary's" ~ "Southern Maryland",
-      COUNTY == "Kent" ~ "Eastern Shore Maryland",
-      COUNTY == "Queen Anne's" ~ "Eastern Shore Maryland",
-      COUNTY == "Talbot" ~ "Eastern Shore Maryland",
-      COUNTY == "Caroline" ~ "Eastern Shore Maryland",
-      COUNTY == "Dorchester" ~ "Eastern Shore Maryland",
-      COUNTY == "Wicomico" ~ "Eastern Shore Maryland",
-      COUNTY == "Somerset" ~ "Eastern Shore Maryland",
-      COUNTY == "Worchester" ~ "Eastern Shore Maryland",
-      COUNTY == "Cecil" ~ "Eastern Shore Maryland",
+      COUNTY %in% c("Garrett", "Allegany", "Washington") ~ "Western Maryland",
+      COUNTY %in% c("Frederick", "Montgomery", "Prince George's") ~ "Capital Region",
+      COUNTY %in% c("Anne Arundel", "Baltimore City", "Baltimore County", "Carroll", "Harford", "Howard") ~ "Central Maryland",
+      COUNTY %in% c("Calvert", "Charles", "Saint Mary's") ~ "Southern Maryland",
+      COUNTY %in% c("Kent", "Queen Anne's", "Talbot", "Caroline", "Dorchester", "Wicomico", "Somerset", "Worcester", "Cecil") ~ "Eastern Shore Maryland",
     )
   ) |>
-  group_by(COUNTY) |>
-  select(COUNTY, REGION, FIRSTNAME, LASTNAME, GENDER, PARTY, STATE_REGISTRATION_DATE, COUNTY_REGISTRATION_DATE) |>
-  filter(COUNTY_REGISTRATION_DATE == STATE_REGISTRATION_DATE) |>
+    filter(COUNTY_REGISTRATION_DATE == STATE_REGISTRATION_DATE) |>
   filter(COUNTY_REGISTRATION_DATE >= "2024-7-21") |>
-  arrange(COUNTY))
+  group_by(REGION) |>
+  summarize(
+    total_amount= n()
+  ) |>
+  arrange(REGION)
 ```
 
 **Q5** What's an additional question you could ask of this data?

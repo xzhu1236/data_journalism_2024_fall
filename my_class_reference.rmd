@@ -44,13 +44,33 @@ Operators
   & and
   <- assign
   = equals
+  > - greater than
+  >= - grater than or equal to
+  %in% - equal to in cases of multiple variables
 
 Functions
+  Lab 1
+  
+  glimpse() - shows a glimpse of the columns in the data
+  arrange() - arranges the data
+    desc() - orders data in descending order
 
-  Pre-lab 2
+  Lab 2
   
   select() - allows you to show specific columns
-  str_to_upper - makes text uppercase
-  case_when - organizes into categories
+  str_to_upper() - makes text uppercase
+  case_when() - organizes into categories
   nrow/ncolumn - gives the number of rows/columns
   mdy() and its combinations - turns data into a date
+  filter() - allowes you to filter data by row
+  
+  Lab 3
+  
+  guess_max() - uses the first 10 rows to set the data type
+  problem() - checks for problems on loading data
+  as.numeric - changes a columns data type to number
+  clean_names() - standardizes column names
+  reanme() - renames a column
+  get_dupes() - checks for duplicate rows
+  distinct() - gets rid of duplicate rows
+  use str_tot_title() - standardizes capitalization
