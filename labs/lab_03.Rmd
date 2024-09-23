@@ -27,6 +27,7 @@ library(janitor)
 ```{r}
 # Load MD slice of FEC House candidate contribution data
 md_contribs <- read_rds("data/lab_03.rds")
+glimpse(md_contribs)
 ```
 
 ## Answer questions
@@ -35,26 +36,81 @@ Q1: Which seven cities in Maryland had the largest *number* of contributions fro
 
 Note: To answer this question, you'll need to see every variation of the "contributor_city" for the top seven cities, which you should identify through some initial analysis. Then find variations of them and change those variations into the most common version.
 
-A1:
+A1: The seven cities with the most donors are; 
+BETHESDA	1177		
+CHEVY CHASE	705		
+BALTIMORE	692		
+POTOMAC	491		
+ANNAPOLIS	490		
+SILVER SPRING	409		
+ROCKVILLE	358	
 
 ```{r}
-
+clean_md_contribs <- (md_contribs |>
+  clean_names() |>
+  distinct() |>
+  mutate(contributor_zip = str_sub(contributor_zip, start=1L, end=5L)) |>
+  mutate(contributor_city = case_when(
+    contributor_city %in% c("BALRIMORE", "BLATIMORE") ~ "BALTIMORE",
+    contributor_city %in% c("4615 NORTH PARK AVE APT. 1410") ~ "CHEVY CHASE",
+    contributor_city %in% c("UPPR MARLBORO") ~ "UPPER MARLBORO",
+    contributor_city %in% c("BROOKVILLE") ~ "BROOKEVILLE",
+    contributor_city %in% c("COLOMBIA") ~ "COLUMBIA",
+    contributor_city %in% c("MARLBORO") ~ "UPPER MARLBORO",
+    contributor_city %in% c("MT. AIRY",
+"MT.AIRY") ~ "MOUNT AIRY",
+    contributor_city %in% c("NEW MARKED") ~ "NEW MARKEt",
+    contributor_city %in% c("OWINS MILLS") ~ "OWINgS MILLS",
+    contributor_city %in% c("POTAMIC") ~ "POTOMAC",
+    contributor_city %in% c("ROCKWELL", "SILVER SPRINGS") ~ "SILVER SPRING",
+    contributor_city %in% c("SAINT MARYS CITY") ~ "ST MARYS CITY",
+    contributor_city %in% c("ST MICHAELS") ~ "SAINT MICHAELS",
+    contributor_city %in% c("TONEYTOWN") ~ "TANEYTOWN",
+    contributor_city %in% c("155 POTOMAC PASSAGE UNIT 521") ~ "OXEN HILL",
+    contributor_city %in% c("BELAIR") ~ "BEL AIR",
+    contributor_city %in% c("GAITHERBURG") ~ "GAITHERSBURG",
+    contributor_city %in% c("LUTHERVILLE-TIMONIUM", "LUTHERVILLE TIMONI", "LUTHERVILLE TIMO",
+"LUTHVLE TIMON") ~ "LUTHERVILLE TIMONIUM",
+    contributor_city %in% c("FT WASHINGTON") ~ "FORT WASHINGTON",
+    contributor_city %in% c("N BETHESDA") ~ "NORTH BETHESDA",
+    TRUE ~ contributor_city
+)))
+clean_md_contribs |>
+  group_by(contributor_city) |>
+  summarize(count = n()) |>
+  arrange(desc(count))
 ```
 
 Q2: Find the 5-digit ZIP code in Maryland that had the highest total amount of contributions (by dollar value). You will need to use mutate to ensure that you have a zip code column with the first five characters from the existing zip code column.
 
 Where is that zip code and what kind of area is it, demographically? Which committee is the largest recipient of money from that zip code? How many of the top five recipients are Maryland candidates?
 
-A2: 
+A2: 20817, it's in Bethesda and made up of primarily white people. The largest committee says that they're for Helmer for Congress. Two of them are Maryland candidates.
 
 ```{r}
+clean_md_contribs |>
+  group_by(contributor_zip) |>
+  summarize(
+    total_contribution = sum(contribution_receipt_amount)
+    ) |>
+  arrange(desc(total_contribution))
 
+clean_md_contribs |>
+  filter(contributor_zip == "20817") |>
+  group_by(committee_name) |>
+  summarize(total_amount = sum(contribution_receipt_amount)) |>
+  arrange(desc(total_amount))
 ```
 
 Q3: Let's look at top individual donors. Write code to generate a list of top donors using name and city, adding up the total amount of contributions. What does the original data say about the top two donors - who are they and what do they do? Do you see anything in the list of top 10 donors that would make you uncertain about the accuracy of these results?
 
-A3: 
+A3: They have the same last name. Melanie appears to be a farmer and Mark works at a financial firm. There are some repeat names just with and without their middle name.
 
 ```{r}
-
+clean_md_contribs |>
+  group_by(contributor_name, contributor_city) |>
+  summarize(
+    total_contribution = sum(contribution_receipt_amount)
+    ) |>
+  arrange(desc(total_contribution))
 ```

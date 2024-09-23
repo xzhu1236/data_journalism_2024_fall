@@ -74,3 +74,4 @@ Functions
   get_dupes() - checks for duplicate rows
   distinct() - gets rid of duplicate rows
   use str_tot_title() - standardizes capitalization
+  floor_date() - sorts from lowest earliest date
