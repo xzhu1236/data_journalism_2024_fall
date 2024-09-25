@@ -47,6 +47,8 @@ Operators
   > - greater than
   >= - grater than or equal to
   %in% - equal to in cases of multiple variables
+  ^ - starts with
+  | - or
 
 Functions
   Lab 1
@@ -75,3 +77,8 @@ Functions
   distinct() - gets rid of duplicate rows
   use str_tot_title() - standardizes capitalization
   floor_date() - sorts from lowest earliest date
+  
+  Lab 4 
+  
+  str_detect() - detects values in columns
+  key_collision_merge - attempts to summarize similar values

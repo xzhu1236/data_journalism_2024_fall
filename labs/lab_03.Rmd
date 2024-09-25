@@ -91,6 +91,7 @@ A2: 20817, it's in Bethesda and made up of primarily white people. The largest c
 clean_md_contribs |>
   group_by(contributor_zip) |>
   summarize(
+    count = n(),
     total_contribution = sum(contribution_receipt_amount)
     ) |>
   arrange(desc(total_contribution))
