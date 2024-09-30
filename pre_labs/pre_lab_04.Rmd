@@ -69,7 +69,7 @@ dc_food |>
 
 ### Task 5: Use refinr to clean the city_clean field.
 
-**Task** Run the following code to make a copy of the recipient_name field called recipient_clean, then use the `key_collision_merge` function from refinr to attempt to standarize similar values. Store it as a new object called cleaned_dc_food. Click the black arrow on the table to examine the recipient_name and recipient_clean columns. Looking at the results on the first two pages only (first 20 rows), name two changes the refinr package made, by comparing recipient_name to recipient_clean. **Answer** I honestly cannot tell
+**Task** Run the following code to make a copy of the recipient_name field called recipient_clean, then use the `key_collision_merge` function from refinr to attempt to standarize similar values. Store it as a new object called cleaned_dc_food. Click the black arrow on the table to examine the recipient_name and recipient_clean columns. Looking at the results on the first two pages only (first 20 rows), name two changes the refinr package made, by comparing recipient_name to recipient_clean. **Answer** Some names are being changed to a different form
 
 ```{r}
 cleaned_dc_food <- dc_food |>
