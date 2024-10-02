@@ -82,3 +82,17 @@ Functions
   
   str_detect() - detects values in columns
   key_collision_merge - attempts to summarize similar values
+  write_csv() = writes to a csv file
+  str_remove - removes words from data
+  str_detect - shows specific words
+  
+  Lab 5
+  
+  bind_rows() - combines rows from different dataframes
+  list() - does something inside of bind_rows()
+  left_join - takes all the records from the left table and only the records that match in the right one
+  right_join - does the same thing
+  inner_join - takes only the records where they are equal
+  full_join - returns all rows of both, regardless of if there’s a match
+  join_by() - joins by correct columns
+  

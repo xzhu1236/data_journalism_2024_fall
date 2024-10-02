@@ -83,10 +83,11 @@ clean_senate_md_expense |>
 
 ```{r}
 clean_senate_md_expense |>
+  mutate(month = floor_date(date, "month")) |>
   filter(purpose_clean == "AD BUY" | purpose_clean == "Media Advertising") |>
-  select(date, amount, candidate, purpose_clean) |>
-  group_by(date) |>
-  arrange(date)
+  select(month, amount, candidate, purpose_clean) |>
+  group_by(month) |>
+  arrange(month)
 ```
 
 **Q4.** Which committee has the larger payroll or salary spending so far? How many unique recipients of payroll/staff spending are there for each candidate?
@@ -98,6 +99,15 @@ clean_senate_md_expense |>
   group_by(candidate, purpose_clean) |>
   summarise(
     count = n(),
+    total_amount = sum(amount)
+  ) |>
+  arrange(desc(total_amount))
+
+clean_senate_md_expense |>
+  filter(candidate == "Alsobrooks",
+         purpose_clean == "Salary") |>
+  group_by(first_name, last_name) |>
+  summarise(
     total_amount = sum(amount)
   ) |>
   arrange(desc(total_amount))
