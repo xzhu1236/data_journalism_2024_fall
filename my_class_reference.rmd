@@ -45,7 +45,7 @@ Operators
   <- assign
   = equals
   > - greater than
-  >= - grater than or equal to
+  >= - greater than or equal to
   %in% - equal to in cases of multiple variables
   ^ - starts with
   | - or
