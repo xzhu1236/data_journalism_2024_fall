@@ -40,7 +40,7 @@ new_voters <- read_csv("data/new_voters.csv")
 Next join the Harris donations to the voter data. Remember, people's names are common, __so you'll want to use name columns and address information__. You'll need to figure out which columns to use from both dataframes. The new_voters data has both a single Address column and various parts of the address, such as HouseNumber. Make a plan for picking your join columns - try out some combinations - and save the results to a new dataframe.
 
 ```{r}
-july_august_harris |> left_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address))
+july_august_harris |> inner_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address))
 ```
 
 ## Answer questions
@@ -51,18 +51,16 @@ A1. I mean the other joins I tried ended up giving me N/A for some columns. I or
 
 Q2. Based on your join, how many donations to Harris have come from people who registered this year? How many unique people does that represent, and which donors have given the largest _number_ of donations since July 20? 
 
-A2. There are 353 unique donors the highest donors are: Emily Duncan, Dennis Meng, and Geoffrey Kinsey. The most donations were given by Brittany Musolino, Eric Snipe, and Sophia Hoffer-Perkins.
+A2. There are 365 unique donors the highest donors are: Emily Duncan, Dennis Meng, and Geoffrey Kinsey. The most donations were given by Brittany Musolino, Eric Snipe, and Sophia Hoffer-Perkins.
 
 ```{r}
-july_august_harris |> left_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
-  filter(Gender != "NA") |>
+july_august_harris |> inner_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
   group_by(first_name, last_name) |>
   arrange(desc(amount)) |>
   select(amount, first_name, last_name)
 
-july_august_harris |> left_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
-  filter(Gender != "NA",
-         date >= "2024-7-20") |>
+july_august_harris |> inner_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
+  filter(date >= "2024-7-20") |>
   group_by(first_name, last_name) |>
   summarise(count = n(),
             total_amount = sum(amount)) |>
@@ -71,17 +69,15 @@ july_august_harris |> left_join(new_voters, join_by( first_name==FirstName, last
 
 Q3. What are the party and gender breakdowns of those donors? How many donations has Harris gotten from non-Democrats?
 
-A3. Harris has mostly Dem donors and a slim amount of Rep donors along with others. There is a slim majority of female voters donating to Harris. Harris has gotten 41 donations from non-Dems.
+A3. Harris has mostly Dem donors and a slim amount of Una donors along with others. There is a slim majority of female voters donating to Harris. Harris has gotten 41 donations from non-Dems.
 
 ```{r}
-july_august_harris |> left_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
-  filter(Gender != "NA") |>
+july_august_harris |> inner_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
   group_by(Party) |>
   summarise(count = n()) |>
   arrange(desc(count))
 
-july_august_harris |> left_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
-  filter(Gender != "NA") |>
+july_august_harris |> inner_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
   group_by(Gender) |>
   summarise(count = n()) |>
   arrange(desc(count))
@@ -92,8 +88,7 @@ Q4. Choose your own adventure: I want you to come up with a question you could a
 A4: What areas in Maryland do new Harris voters come from?
 
 ```{r}
-july_august_harris |> left_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
-  filter(Gender != "NA") |>
+july_august_harris |> inner_join(new_voters, join_by( first_name==FirstName, last_name==LastName, address_one==Address)) |>
   group_by(County) |>
   summarise(count = n()) |>
   arrange(desc(count))

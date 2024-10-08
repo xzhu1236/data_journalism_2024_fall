@@ -25,7 +25,9 @@ In this notebook, we are reverse engineering the story, [STORY NAME](STORY URL)
 Loading required libraries for this analysis.
 
 ```{r echo=FALSE, message=FALSE}
-
+library(tidyverse)
+library(lubridate)
+library(janitor)
 ```
 
 ## Load and Cleaning Data
@@ -33,13 +35,35 @@ Loading required libraries for this analysis.
 In this section, describe the source of the data, write a basic data dictionary for data you are working with, and discuss any caveats or issues you discovered working with this data. 
 
 ```{r}
-# Load required data
+NC_voter_data <- read_csv("data/NC_voter_data.csv",
+  guess_max = 2111797)
+```
 
+```{r}
+clean_NC_voters <- NC_voter_data |>
+  clean_names() |>
+  mutate(
+    voter_zip = as.character(voter_zip),
+    election_dt = as.Date(election_dt),
+    ballot_req_dt = as.Date(ballot_req_dt),
+    ballot_send_dt = as.Date(ballot_send_dt),
+    ballot_rtn_dt = as.Date(ballot_rtn_dt)
+  )
+```
+
+```{r}
+glimpse(clean_NC_voters)
 # Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
 
-# Clean required data and prepare for analysis if needed. 
+# Clean required data and prepare for analysis if needed.
+```
 
-
+```{r}
+NC_voter_data|>
+  filter(race == "BLACK or AFRICAN AMERICAN") |>
+  group_by(race, ballot_rtn_status)|>
+  summarise(count = n())|>
+arrange(desc(count))
 ```
 
 ## Sentences to Engineer
