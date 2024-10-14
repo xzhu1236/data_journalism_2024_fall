@@ -93,61 +93,172 @@ Do all of that again, for the [September 2022 voter registration update](https:/
 To answer the following questions, you'll need to calculate percentages and do other calculations. Whether you do that by combining or joining dataframes or you write code to run separately on both is up to you.
 
 ```{r}
-# Party registrations
-
+MD_2022_active <- read_csv("data/2022_MD_voter_active.csv") |>
+  clean_names() |>
+  rename(summary = x1)
+MD_2022_active
 ```
 
 ```{r}
-# Removals
-
+MD_2022_removals <- read_csv("data/2022_MD_voter_removals.csv") |>
+  clean_names() |>
+  rename(method = x1)
+MD_2022_removals
 ```
 
 ```{r}
-# Changes
-
+MD_2022_changes <- read_csv("data/2022_MD_voter_changes.csv") |>
+  clean_names() |>
+  rename(county = x1)
+MD_2022_changes
 ```
 
 ```{r}
-# Current registrations
-
+MD_2022_current <- read_csv("data/2022_MD_voter_current.csv") |>
+  clean_names() |>
+  select(-address, -name, -dem_4, -rep_5, -grn_6, -lib_7, -wcp_8, -unaf_9, -oth_10, -total_11) |>
+  rename(
+    county = x1,
+    dem = dem_12,
+    rep = rep_13,
+    grn = grn_14,
+    lib = lib_15,
+    wcp = wcp_16,
+    unaf = unaf_17,
+    oth = oth_18,
+    total = total_19
+  )
+MD_2022_current
 ```
 
 ## Answer questions
 
 Q1. Calculate the percentage of registered Democrats, Republicans and unaffiliated voters for the entire state in September 2024 and September 2022, and then calculate the percentage change for those three party categories (the formula for percentage change is easy to remember: (New-Old)/Old). How would you describe the changes in these partisan categories in a story? What's the most interesting thing about these changes that would be the lede of that story?
 
-A1.
+A1. The amount of gem and republican voters didn't change thast much overall, but the amount of unaffliated voters increased by nearly ten percent.
 
 ```{r}
+MD_percentage_calc <- current |> left_join(MD_2022_current, join_by(county)) |>
+  select(-county, -nlm, -lib.x, -grn.x, -oth.x, -grn.y, -lib.y, -wcp, -oth.y) |>
+  rename(
+    dem_2024 = dem.x,
+    rep_2024 = rep.x,
+    unaf_2024 = unaf.x,
+    total_2024 = total.x,
+    dem_2022 = dem.y,
+    rep_2022 = rep.y,
+    unaf_2022 = unaf.y,
+    total_2022 = total.y
+  ) |>
+  summarise(
+    dem_2024 = sum(dem_2024),
+    rep_2024 = sum(rep_2024),
+    unaf_2024 = sum(unaf_2024),
+    total_2024 = sum(total_2024),
+    dem_2022 = sum(dem_2022),
+    rep_2022 = sum(rep_2022),
+    unaf_2022 = sum(unaf_2022),
+    total_2022 = sum(total_2022)
+  ) |>
+  mutate(
+    percent_dem_2024 = (dem_2024/total_2024)*100,
+    percent_rep_2024 = (rep_2024/total_2024)*100,
+    percent_unaf_2024 = (unaf_2024/total_2024)*100,
+    percent_dem_2022 = (dem_2022/total_2022)*100,
+    percent_rep_2022 = (rep_2022/total_2022)*100,
+    percent_unaf_2022 = (unaf_2022/total_2022)*100,
+    change_dem = (dem_2024-dem_2022)/dem_2022*100,
+    change_rep = (rep_2024-rep_2022)/rep_2022*100,
+    change_unaf = (unaf_2024-unaf_2022)/unaf_2022*100,
+  )
 
+MD_percentage_calc
 ```
 
 Q2. Among the Maryland jurisdictions with the most registered voters, which one had the biggest percentage increase in unaffiliated voters between 2022 and 2024? How did that county vote for governor in 2022 and for president in 2020? Contrast the partisan percentages of that county with the county that had the eighth-largest percentage increase in unaffiliated voters. You should display information from the data that shows the counties with the largest percentage increase first.
 
-A2.
+A2. Prince George's
+
+They voted overwhelmingly for Dem in the governor and presidential elections. In Fredrick Dems still had majority but it was with much slimmer margins.
 
 ```{r}
+MD_unaf_change <- current |> left_join(MD_2022_current, join_by(county)) |>
+  select(-dem.x, -rep.x, -nlm, -lib.x, -grn.x, -oth.x, -dem.y, -rep.y, -grn.y, -lib.y, -wcp, -oth.y) |>
+  rename(
+    unaf_2024 = unaf.x,
+    total_2024 = total.x,
+    unaf_2022 = unaf.y,
+    total_2022 = total.y
+  ) |>
+  mutate(
+    percent_unaf_2024 = (unaf_2024/total_2024)*100,
+    percent_unaf_2022 = (unaf_2022/total_2022)*100,
+    change_unaf = (unaf_2024-unaf_2022)/unaf_2022*100,
+  ) |>
+  group_by(change_unaf) |>
+  arrange(desc(change_unaf))
 
+MD_unaf_change
 ```
 
 Q3. Do the party percentages of new registrants (% Dem, % Rep, % Unaffiliated) from September 2024 and September 2022 match the overall percentage of partisan registration in the state at those times?
 
 In other words, did new registrants mirror the overall partisan composition of the electorate, or were they different? Do any of the methods of registration vary significantly from the overall partisan pattern? Which method is worthy of further exploration?
 
-A3.
+A3. I guess, the numver if dems increased by a larger amount than the amount of rep and unaf. It looks like new registrations for most ways have dropped across the board except for online registrations, which have increased a ton.
 
 ```{r}
+MD_percentage_new <- new_registrations |> left_join(MD_2022_active, join_by(summary)) |>
+  select(-nlm, -lib.x, -grn.x, -oth.x, -grn.y, -lib.y, -wcp, -oth.y) |>
+  rename(
+    dem_2024 = dem.x,
+    rep_2024 = rep.x,
+    unaf_2024 = unaf.x,
+    total_2024 = total.x,
+    dem_2022 = dem.y,
+    rep_2022 = rep.y,
+    unaf_2022 = unaf.y,
+    total_2022 = total.y
+  ) |>
+  mutate(
+    percent_dem_2024 = (dem_2024/total_2024)*100,
+    percent_rep_2024 = (rep_2024/total_2024)*100,
+    percent_unaf_2024 = (unaf_2024/total_2024)*100,
+    percent_dem_2022 = (dem_2022/total_2022)*100,
+    percent_rep_2022 = (rep_2022/total_2022)*100,
+    percent_unaf_2022 = (unaf_2022/total_2022)*100,
+    change_dem = (dem_2024-dem_2022)/dem_2022*100,
+    change_rep = (rep_2024-rep_2022)/rep_2022*100,
+    change_unaf = (unaf_2024-unaf_2022)/unaf_2022*100,
+  )
 
+MD_percentage_new
 ```
 
 Q4. Choose your own adventure! Using both the 2024 and 2022 data for one of the dataframes (changes, removals or new registrations), ask and answer a question that makes at least one comparison and requires code to answer. That could involve calculating a percentage, percentage change or the raw difference between two columns.
 
-A4.
+A4. What county has the largest increase in rep voters?
+Cecil with almost a 10 percent increase
 
 ```{r}
+MD_percentage_increase <- current |> left_join(MD_2022_current, join_by(county)) |>
+  select(-dem.x, -nlm, -lib.x, -grn.x, -unaf.x, -oth.x, -dem.y, -grn.y, -lib.y, -wcp, -unaf.y, -oth.y, -dem.y, -unaf.y) |>
+  rename(
+    rep_2024 = rep.x,
+    rep_2022 = rep.y,
+    total_2024 = total.x,
+    total_2022 = total.y
+  ) |>
+  mutate(
+    percent_rep_2024 = (rep_2024/total_2024)*100,
+    percent_rep_2022 = (rep_2022/total_2022)*100,
+    change_rep = (rep_2024-rep_2022)/rep_2022*100
+  ) |>
+  arrange(desc(change_rep))
 
+MD_percentage_increase
 ```
 
 Q5. What's the best story idea or question you've seen as a result of the work you've done in this lab?
 
-A5.
+A5. Definitely the change in the way people register, the shift is huge and significant
