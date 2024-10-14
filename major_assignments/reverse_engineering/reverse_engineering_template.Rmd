@@ -44,65 +44,79 @@ clean_NC_voters <- NC_voter_data |>
   clean_names() |>
   mutate(
     voter_zip = as.character(voter_zip),
-    election_dt = as.Date(election_dt),
-    ballot_req_dt = as.Date(ballot_req_dt),
-    ballot_send_dt = as.Date(ballot_send_dt),
-    ballot_rtn_dt = as.Date(ballot_rtn_dt)
-  )
+    election_dt = mdy(election_dt),
+    ballot_req_dt = mdy(ballot_req_dt),
+    ballot_send_dt = mdy(ballot_send_dt),
+    ballot_rtn_dt = mdy(ballot_rtn_dt)
+  ) 
 ```
 
 ```{r}
 glimpse(clean_NC_voters)
-# Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
-
-# Clean required data and prepare for analysis if needed.
+clean_NC_voters |>
+  group_by(ballot_req_dt) |>
+  summarise(count=n()) |>
+  arrange(ballot_req_dt)
 ```
 
-```{r}
-NC_voter_data|>
-  filter(race == "BLACK or AFRICAN AMERICAN") |>
-  group_by(race, ballot_rtn_status)|>
-  summarise(count = n())|>
-arrange(desc(count))
-```
+
 
 ## Sentences to Engineer
 In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 1
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: “Black voters were more than twice as likely to have mail-in ballots rejected than those submitted by the state’s white voters in 2018, and rejection rates for 2020 show a similar pattern, according to a new analysis by ProPublica and WRAL News.” 
+* **Analysis summary**: This paragraph establishes a foundation for the entire investigation. It is clear that original data analysis by the reporters unearthed racial disparities in ballot rejection rates. This finding is key to understanding the study's focus on systemic inequalities.
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
-
+clean_NC_voters|>
+  filter(ballot_rtn_status != "ACCEPTED") |>
+  group_by(race) |>
+  summarise(count = n())|>
+arrange(desc(count))
 ```
 
 ### Sentence 2
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: “Guilford County, the third-most populous county in North Carolina, rejected the largest number of mail-in ballots by Black voters statewide: 177. The rejection rate for Black voters, at 16.5%, was three times as high as the rejection rate for white voters, 5.5%, putting the county largely in line with the rest of the state.” 
+* **Analysis summary**: This specific example illustrates a racial disparity in one of the most populous counties, revealing how data analysis spotlighted local discrepancies and used them as evidence of broader statewide patterns.
+
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
-
+clean_NC_voters |>
+  group_by(county_desc, race)|>
+  summarise(count = n())|>
+arrange(desc(count))
 ```
 
 ### Sentence 3
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: “So far, 2020 shows a similar pattern. As of Sept. 23, the rejection rate for mail-in ballots submitted by Black voters was about 3%, nearly three times as high as the rejection rate for white voters, according to data from the state.” 
+* **Analysis summary**: This paragraph shows the continuity of the trend, linking current data to the same issues observed in 2018. It confirms that disparities persist.
+**NOTE** This is what I would do if we had 2020 data
+
 
 ```{r}
-# Put code to reverse engineer sentence here
+NC_rejected <- clean_NC_voters |>
+  filter(ballot_rtn_status != "ACCEPTED",
+         ballot_req_type == "MAIL") |>
+  group_by(race)|>
+  summarise(count = n())|>
+arrange(desc(count))
 
-# Display results of code below this codeblock
-
+NC_total_race <- clean_NC_voters |>
+  filter(ballot_req_type == "MAIL") |>
+  group_by(race) |>
+  summarise(count = n()) |>
+arrange(desc(count))
+  
+NC_percent_rejected <- NC_total_race |> left_join(NC_rejected, join_by(race)) |>
+  rename(
+    total = count.x,
+    rejected = count.y
+  ) |>
+  mutate(percent_spolied = (rejected/total))
 ```
 
 ### Sentence 4
