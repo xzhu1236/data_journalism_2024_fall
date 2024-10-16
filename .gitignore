@@ -41,3 +41,5 @@ vignettes/*.pdf
 # DS Store
 .DS_Store
 *.DS_Store
+
+NC_voter_data.csv
