@@ -46,7 +46,7 @@ You'll also need to load the list of American Community Survey variables from th
 
 ```{r}
 ACS_2022 <- load_variables(2022, "acs5", cache = TRUE)
-ACS_2022age
+ACS_2022
 ```
 
 ## Answer questions
@@ -89,7 +89,11 @@ Frederick_vote
 
 **Q3** Let's answer some basic questions about ticket-splitting: how many voters voted for different parties in the governor and comptroller's race? How many voted for the same party in both races? What percentage of all voters split their tickets in those races? In how many cases did voters choose the same party in all five contests? What percentage of all voters does that represent?
 
-**A3**
+**A3** how many voters voted for different parties in the governor and comptroller's race? 11871
+How many voted for the same party in both races? 96221
+What percentage of all voters split their tickets in those races? 11 percent
+In how many cases did voters choose the same party in all five contests? 89916
+What percentage of all voters does that represent? 83.8 percent
 
 ```{r}
 different <- Frederick_vote |> 
@@ -98,27 +102,74 @@ different <- Frederick_vote |>
 
 same <- Frederick_vote |> 
   filter(governor_lt_governor == comptroller) |>
-  summarise(same = n())
+  summarise(same_gov_comp = n())
+
+all <- Frederick_vote |> 
+  filter(governor_lt_governor == comptroller & comptroller == attorney_general & attorney_general == u_s_senator & u_s_senator == representative_in_congress_6) |>
+  summarise(all_same = n())
 
 total <- Frederick_vote |> 
-  summarise(same = n())
+  summarise(total = n())
 
-Frederick_split <- bind_cols(different, same, total)
-Frederick_split |>
-  
+Frederick_split <- bind_cols(different, same, all, total) |>
+  mutate(percent_split = (different/total)*100,
+         percent_same = (all_same/total)*100)
 ```
 
 **Q4** Now let's look for the zip codes where voters preferred Republicans in every race *except* the governor's race, where Dan Cox lost to Wes Moore by a wide margin. Write code to generate a dataframe of zip codes with the number of those voters for each of those zip codes, ordering the dataframe so that the zip code with the most ticket-splitters appears first.
 
-**A4**
+**A4** It has been done
 
 ```{r}
+split <- Frederick_vote |> 
+  filter(governor_lt_governor != comptroller | comptroller != attorney_general | attorney_general != u_s_senator | u_s_senator != representative_in_congress_6) |>
+  group_by(zipcode) |>
+  summarise(count = n()) |>
+  arrange(desc(count))
 
+zip_rep_gov <- Frederick_vote |>
+  filter(governor_lt_governor == "REP") |>
+  group_by(zipcode) |>
+  summarise(governor = n())
+
+zip_rep_comp <- Frederick_vote |>
+  filter(comptroller == "REP") |>
+  group_by(zipcode) |>
+  summarise(comptroller = n())
+
+zip_rep_sen <- Frederick_vote |>
+  filter(u_s_senator == "REP") |>
+  group_by(zipcode) |>
+  summarise(senator = n())
+
+zip_rep_at <- Frederick_vote |>
+  filter(attorney_general == "REP") |>
+  group_by(zipcode) |>
+  summarise(attorney_general = n())
+
+zip_rep_congress <- Frederick_vote |>
+  filter(representative_in_congress_6 == "REP") |>
+  group_by(zipcode) |>
+  summarise(House = n())
+
+zip_rep_frame <- reduce(list(split, zip_rep_gov,  zip_rep_comp, zip_rep_at, zip_rep_sen, zip_rep_congress), left_join, join_by(zipcode)) |>
+  mutate(zipcode = as.character(zipcode)) |>
+  arrange(desc(count)) |>
+  select(-count)
 ```
 
 **Q5** Let's find out more about those zip codes from A4. Using tidycensus, get a dataframe of Maryland zip codes and their median ages, then join it to the dataframe you produced in A4. NOTE: you'll need to ensure that the two columns you use for the join are the same datatype. Summarize your findings; how would you describe the zip codes with more non-Cox Republicans compared to those with fewer? Where are those leading zip codes located?
 
-**A5**
+**A5** They're fairly wealthy
 
 ```{r}
+zip_age_2022 <- get_acs(geography = "zcta",
+              variables = c(age = "B01002_001"),
+              year = 2022) |>
+  rename(zipcode = GEOID)
+
+Frederick_zip <- zip_rep_frame |>
+  left_join(zip_age_2022, join_by(zipcode))
+
+Frederick_zip
 ```
