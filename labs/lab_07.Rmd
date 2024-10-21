@@ -53,7 +53,7 @@ ACS_2022
 
 **Q1** What is the Maryland jurisdiction with the lowest median age, according to the ACS 2022 5-year estimates? You will need to find the variable for median age first.
 
-**A1** B01002_001
+**A1** Baltimore City
 
 ```{r}
 md_age_2022 <- get_acs(geography = "county",
