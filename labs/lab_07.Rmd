@@ -124,8 +124,8 @@ Frederick_split <- bind_cols(different, same, all, total) |>
 split <- Frederick_vote |> 
   filter(governor_lt_governor != comptroller | comptroller != attorney_general | attorney_general != u_s_senator | u_s_senator != representative_in_congress_6) |>
   group_by(zipcode) |>
-  summarise(count = n()) |>
-  arrange(desc(count))
+  summarise(split_vote = n()) |>
+  arrange(desc(split_vote))
 
 zip_rep_gov <- Frederick_vote |>
   filter(governor_lt_governor == "REP") |>
@@ -154,13 +154,12 @@ zip_rep_congress <- Frederick_vote |>
 
 zip_rep_frame <- reduce(list(split, zip_rep_gov,  zip_rep_comp, zip_rep_at, zip_rep_sen, zip_rep_congress), left_join, join_by(zipcode)) |>
   mutate(zipcode = as.character(zipcode)) |>
-  arrange(desc(count)) |>
-  select(-count)
+  arrange(desc(split_vote))
 ```
 
 **Q5** Let's find out more about those zip codes from A4. Using tidycensus, get a dataframe of Maryland zip codes and their median ages, then join it to the dataframe you produced in A4. NOTE: you'll need to ensure that the two columns you use for the join are the same datatype. Summarize your findings; how would you describe the zip codes with more non-Cox Republicans compared to those with fewer? Where are those leading zip codes located?
 
-**A5** They're fairly wealthy
+**A5** They're younger
 
 ```{r}
 zip_age_2022 <- get_acs(geography = "zcta",
