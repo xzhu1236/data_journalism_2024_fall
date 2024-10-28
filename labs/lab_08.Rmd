@@ -100,7 +100,7 @@ md_low_return |>
 ```
 **Q3** Let's make a line chart using the second set of absentee ballot data - this one tracking returns by date. We want to see received ballots for Frederick County for Democrats, Republicans and Others, so you'll make a chart with three lines, adding color to each one (you can choose, but choose sensibly). Give the chart a title and good labels. What's the story that this line chart tells? Compare and contrast the three lines. Does it match what you know about absentee voting habits?
 
-**A3** 
+**A3** People send in more absentee balot votes the closer it is to election day. Democrats are the most by far.
 
 ```{r}
 frederick <- md_absentee_date |>
@@ -108,9 +108,15 @@ frederick <- md_absentee_date |>
 
 frederick |>
   ggplot(aes(x=date)) + 
-  geom_line(aes(y = dem_received, color = "blue")) +
-  geom_line(aes(y = rep_received, color = "red")) +
-  geom_line(aes(y = oth_received, color = "green"))
+  geom_line(aes(y = dem_received, color = "Democrat")) +
+  geom_line(aes(y = rep_received, color = "Republican")) +
+  geom_line(aes(y = oth_received, color = "Other")) +
+  labs(
+    title = "Number of ballots returned by date",
+    x = "Date",
+    y = "Number of ballots returned",
+    caption = "Source: Maryland State Board of Elections"
+  )
 ```
 
 **Q4.** A scatterplot is a type of chart that helps us see relationships between two variables. One variable goes on the x axis, the other on the y axis. For each row/observation in our data, a scatterplot puts a circle (or a "point") where the two variables intersect on a grid.
@@ -131,9 +137,20 @@ Follow these steps:
 4. Add a line of fit to the plot using geom_smooth (https://ggplot2.tidyverse.org/reference/geom_smooth.html#ref-examples). Specify the method as lm.
 5. In the answer space below, describe what you see. In a general sense, how would you report out the main point(s) of this chart? Are there counties that seem to be over or under-performing in relation to the overall trend?
 
-**A4.** 
+**A4.** Honestly, it looks like most counties fall on the line of best fit well
 
 ```{r}
-
-  
+md_absentee |>
+  ggplot() +
+  geom_point(aes(x=total_sent, y=total_received)) +
+  geom_text(aes(x = total_sent, y = total_received, label = county_name), angle = -45, size = 2, vjust = -2) +
+  geom_smooth(aes(x = total_sent, y = total_received), method = 'lm') +
+  labs(
+    title = "Number of ballots sent in comparison to number returned",
+    x = "Sent",
+    y = "Returned",
+    caption = "Source: Maryland State Board of Elections"
+  )
 ```
+
+Chatpgpt conversation: https://chatgpt.com/share/671ff9ee-2f0c-800f-860a-9bd9fe8bd421
