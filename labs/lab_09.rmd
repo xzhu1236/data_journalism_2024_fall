@@ -93,7 +93,9 @@ Then export each dataframe using `write_csv` and make two (2) choropleth maps in
 
 Compare the two maps. What do you think are the most interesting story ideas in both, and what would you want to know more about? Put the answer below along with the URLs of your maps.
 
-**A3.** 
+**A3.** I would want to know more about how the data was gathered because there was a huge difference in the Montgomery county numbers between WinRed and actblue. The most interesteting story is probably looking at the difference in numbers in Dorchester county because actblue has 1 donation in that area.
+https://datawrapper.dwcdn.net/YHKFG/1/
+https://datawrapper.dwcdn.net/7b1LE/1/
 
 ```{r}
 md_winred <- read_csv("data/md_winred_zip_totals.csv") |>
@@ -109,6 +111,7 @@ md_pop <- get_acs(geography = "zcta",
 md_winred_pop <- md_winred |>
   left_join(md_pop, join_by(zip == GEOID)) |>
   mutate(per_capita = (total/estimate)*1000)
+
 md_actblue_pop <- md_actblue |>
   left_join(md_pop, join_by(zip == GEOID)) |>
   mutate(per_capita = (total/estimate)*1000)
