@@ -1,0 +1,38 @@
+---
+title: "data_analysis_project"
+output: html_document
+date: "2024-11-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(janitor)
+```
+
+```{r}
+house_expenditure_apr_jun <- read_csv("data/House_office_expenditures_apr_jun.csv")
+
+house_expenditure_jan_mar <- read_csv("data/House_office_expenditures_jan_mar.csv")
+
+house_expenditure <- bind_rows(house_expenditure_jan_mar, house_expenditure_apr_jun) |>
+  clean_names() |>
+  mutate(
+    budget_object_class = as.character(budget_object_class),
+    transaction_date = as.Date(transaction_date, format = "xd-xm-xy")
+    )
+
+glimpse(house_expenditure)
+```
+
+```{r}
+#tanodm code to look through stuff
+house_expenditure |>
+  group_by(description) |>
+  summarise(count = n()) |>
+  arrange(desc(count))
+```

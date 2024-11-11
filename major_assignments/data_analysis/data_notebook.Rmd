@@ -1,0 +1,31 @@
+---
+title: "data_analysis_notebook"
+output: html_document
+date: "2024-11-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Week 2
+
+Describe the limits of the data in terms of timeframe, what is and is not included and any codes or other information you'd need to find definitions for, and what you've done to better define it.
+
+Our combined dataset is 18 columns with 283,590 rows. The limits on timeframe
+is that there's an inconsistency in the start date and performance date of the
+expenditure. This means that we don't have a specific hold on the exact date
+that the congressmen incurred that expense. Furthermore, the dataset column of
+transaction date has a lot of NAs, which can cause us to not know the specifics
+of these expenses to know whether or not congressmen used it during their primary
+runs. 
+
+One: There may be issues answering this question with our dataset since not all transactions have dates attached to them. This might make estimating the amount of spending each program is making inaccurate.
+
+Two: For our question about top spenders on travel we will have to focus on either ground transportation or land transportation due to the fact that there are various descriptions of travel. For example, “TRANSPORTATION OF THINGS TOTALS” could be anything, so we need to be specific on one type of transportation
+
+Three: For our question on who spent the most on advertising the data is clean and specific that we can get a calculation on it. 
+
+Four: For question four, the data is clean enough to see who had the most expenditures within the dataframe. Because we joined the two dataframes together, we can easily keep a running tally of who has spent what money thus far. The way we can express it in this data is with the sum of “AMOUNT” grouped by office.
+
+Five: There wouldn’t be any issues for this question with the dataset. All of the descriptions are listed and they are well documented.
