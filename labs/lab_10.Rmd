@@ -70,13 +70,15 @@ Also answer this: is a map the best way to present this data? What else could yo
 
 ```{r}
 md_pres <- read_csv("data/md_pres_county_24.csv") |>
-  mutate(GEOID = as.character(GEOID))
+  mutate(GEOID = as.character(GEOID)) |>
+  mutate(
+    total_nat = Harris + Trump + Oliver + Stein + Kennedy,
+    per_Trump = (Trump/total_nat)*100,
+  )
 
 md_diff_nat <- md_pres |>
   left_join(md_senate, join_by("County", "GEOID")) |>
   mutate(
-    total_nat = Harris + Trump + Oliver + Stein + Kennedy,
-    per_Trump = (Trump/total_nat)*100,
     per_diff_nat = per_Hogan - per_Trump
   )
 
@@ -92,17 +94,60 @@ ggplot() +
 
 **Q3** Make another map showing the difference between Larry Hogan's county-level performance this year and from his governor race in 2018, using percentages to compare the two as you did in Q2. You can use the dataframe you initially loaded for Q1, and you'll need to load the 2018 governor results in the data folder and join them to it before proceeding. Are there any counties where Hogan did better this year? How would you describe the map showing the difference?
 
-**A3**
+**A3** No, it appears that Hogan has done worse this year compared to 2018.
 
 ```{r}
+library(mapview)
+```
+
+```{r}
+md_gov <- read_csv("data/md_gov_county_18.csv") |>
+  adorn_totals("col") |>
+  as.data.frame() |>
+  mutate(
+    per_Hogan_18 = (Hogan/Total)*100,
+    GEOID = as.character(GEOID)
+    ) |>
+  select(GEOID, per_Hogan_18)
+
+md_vote_18v24 <- md_gov |>
+  left_join(md_senate, join_by(GEOID)) |>
+  mutate(Hogan_diff = per_Hogan - per_Hogan_18)
+
+md_vote_18v24c <- md_counties |>
+  left_join(md_vote_18v24, join_by("GEOID")) |>
+  clean_names()
+
+md_vote_18v24c |>
+  ggplot() +
+  geom_sf(aes(fill=hogan_diff)) +
+  scale_colour_viridis_b(option="magma") +
+  theme_minimal()
 ```
 
 **Q4.** Choose your own map adventure! In the data folder I've included Maryland county-level results for the abortion rights amendment vote this year, plus the 2020 presidential results by county and 2022 governor's results by county. Using one of those and at least one other contest for comparison, make a county-level map showing what you think is the most interesting aspect of that data, and describe the results in terms of a possible story. You can bring in other data, such as Census information, if you like.
 
-**A4.**
+**A4.** I looked at the difference between Trump votes and the votes against abortion. The amount of people voting for Trump is significantly higher than the amount of people who voted against abortion. The difference becomes closer as the places become more heavily populated.
 
 ```{r}
+md_abortion <- read_csv("data/md_abortion_24.csv") |>
+  adorn_totals("col") |>
+  mutate(
+    per_against = (Against/Total)*100
+  )
 
+md_abort_pres <- md_pres |>
+  left_join(md_abortion, join_by(County)) |>
+  mutate(per_abort_diff = per_Trump - per_against)
+
+md_abort_presc <- md_counties |>
+  left_join(md_abort_pres, join_by(GEOID))
+
+md_abort_presc |>
+  ggplot() +
+  geom_sf(aes(fill=per_abort_diff)) +
+  scale_colour_viridis_b(option="magma") +
+  theme_minimal()
 ```
 
 -30-
