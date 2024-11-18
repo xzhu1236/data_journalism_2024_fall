@@ -264,6 +264,8 @@ committees_with_urls <- tibble(
   name = committees %>% html_text(trim = TRUE),
   url = committees %>% html_attr("href")
 )
+
+committees_with_urls
 ```
 
 Now we're getting closer. The rows in this dataframe we don't want begin with a backslash. Let's get rid of those using `filter()`:

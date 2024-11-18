@@ -36,3 +36,35 @@ house_expenditure |>
   summarise(count = n()) |>
   arrange(desc(count))
 ```
+
+Question 4
+
+Who is the top spender based on the data available for 2024, and what have they spent the most on? This is similar to the question The Washington Post team asked for their article on the subject. We believe it’s still important to know if the top spender has changed and if there was an increase. 
+
+```{r}
+house_expenditure |>
+  filter(fiscal_year_or_legislative_year == "LY2024",
+         str_detect(organization, "HON.")) |>
+  group_by(organization) |>
+  summarise(
+    count = n(),
+    total = sum(amount)
+  ) |>
+  arrange(desc(total))
+```
+
+Question 5
+
+Who is the top recipient of government money? This data would effectively show the top non-military government contractors in America right now. Other journalistic works have looked to show the most profitable military contractors using profit reports, but never through this method.
+
+```{r}
+house_expenditure |>
+  filter(fiscal_year_or_legislative_year == "LY2024") |>
+  group_by(vendor_name) |>
+  summarise(
+    count = n(),
+    total = sum(amount)
+  ) |>
+  arrange(desc(total))
+```
+
