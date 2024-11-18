@@ -19,6 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(rvest)
+library(tidyr)
 library(tidyverse)
 library(janitor)
 ```
@@ -76,21 +77,18 @@ prosecutor_release <- "https://osp.maryland.gov/category/press-releases/"
 
 result_pros <- prosecutor_release |>
   read_html()
-```
 
-```{r}
 pros_release <- result_pros |> html_elements('article a')
 
 result_pros_title <- tibble(
-  Title = pros_release %>% html_text(trim = TRUE),
+  title = pros_release %>% html_text(trim = TRUE),
   url = pros_release %>% html_attr("href")
-)
-
-
-  #Date = result_pros %>% html_elements("time") %>% html_text(trim = TRUE)
+) |>
+  filter(! str_detect(title, "Read the Rest")) |>
+  separate(title, into = c("date", "extra"), sep = ":", remove = FALSE, convert = FALSE) |>
+  select(-extra)
 
 result_pros_title
-pros_release
 ```
 
 **Q3** Sen. Ben Cardin, D-Maryland, has posted hundreds of press releases at <https://www.cardin.senate.gov/?post_type=press-releases>. It would be great to have all of them in a dataframe that has the following columns: date, title and url.
