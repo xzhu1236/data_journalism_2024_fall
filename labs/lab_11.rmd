@@ -85,10 +85,10 @@ result_pros_title <- tibble(
   url = pros_release %>% html_attr("href")
 ) |>
   filter(! str_detect(title, "Read the Rest")) |>
-  separate(title, into = c("date", "extra"), sep = ":", remove = FALSE, convert = FALSE) |>
-  select(-extra)
+  separate(title, into = c("date", "title"), sep = ":", remove = FALSE, convert = FALSE)
 
-result_pros_title
+result_pros_title |>
+  filter(str_detect(title, "campaign|Campaign"))
 ```
 
 **Q3** Sen. Ben Cardin, D-Maryland, has posted hundreds of press releases at <https://www.cardin.senate.gov/?post_type=press-releases>. It would be great to have all of them in a dataframe that has the following columns: date, title and url.
@@ -101,8 +101,34 @@ When you're done, rename the columns so they make sense, then make sure the date
 
 Finally, tell me what questions you could ask of this data, and what other information about it would be useful to have. Be creative.
 
-**A3**
+**A3** When are the most press releases posted
 
 ```{r}
+Ben_release <- "https://www.cardin.senate.gov/?post_type=press-releases"
 
+Ben_release <- Ben_release |>
+  read_html()
 ```
+
+```{r}
+date <- Ben_release |> 
+  html_elements("h5") |>
+  html_text() |>
+  as_tibble()
+
+title <- Ben_release |> 
+  html_elements("h3 a") |>
+  html_text() |>
+  as_tibble()
+
+url <- Ben_release |> 
+  html_elements("h3 a") |>
+  html_attr("href") |>
+  as_tibble()
+
+Ben_df <- title |>
+  bind_cols(date, url) |>
+  clean_names() |>
+  rename(title = 1, date = 2, url = 3)
+```
+Manic ChatGOT conversation: https://chatgpt.com/share/673be7bf-eed4-800f-a879-93db9d590ee9
