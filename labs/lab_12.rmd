@@ -1,0 +1,86 @@
+---
+title: "lab_12"
+author: "Derek Willis"
+date: "2023-05-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## You will need
+
+* tidytext and our usual libraries
+
+## Load libraries and establish settings
+
+**Task** Create a codeblock and load appropriate packages and settings for this lab.
+
+```{r}
+library(tidyverse)
+library(tidytext)
+library(janitor)
+library(lubridate)
+library(rvest)
+```
+
+## Questions
+
+**Q1.** You've been assigned to report a story about the leading reasons that Maryland attorneys get sanctioned by the state for misconduct. The state [publishes lists of sanctions](https://www.courts.state.md.us/attygrievance/sanctions) that contain a short text description about the situation. Load the CSV file in the data folder containing records from fiscal year 2011 onwards. Make a list of unique words from the text column, then following the example in the pre_lab, remove common "stop words" from that list and create a list of the top 10 words containing the percentage of occurrences each word represents. What's the leading word in that answer and, broadly, what do you think the top 10 words describe?
+
+**A1.**  
+
+```{r}
+md_att_sanc <- read_csv("data/md_attorney_sanctions.csv")
+```
+```{r}
+data("stop_words")
+
+stop_words <- stop_words |>
+  add_row(word = "client") |>
+  add_row(word = "respondent") |>
+  add_row(word = "attorney") |>
+  add_row(word = "clients") |>
+  add_row(word = "conduct") |>
+  add_row(word = "engaging") |>
+  add_row(word = "representation") |>
+  add_row(word = "reprimand") |>
+  add_row(word = "consent") |>
+  add_row(word = "counsel") |>
+  add_row(word = "commission") |>
+  add_row(word = "communicate") |>
+  add_row(word = "administration") |>
+  add_row(word = "court") |>
+  add_row(word = "justice") |>
+  add_row(word = "bar") |>
+  add_row(word = "court") |>
+  add_row(word = "prejudicial") |>
+  add_row(word = "account") |>
+  add_row(word = "law") |>
+  add_row(word = "client's")
+```
+
+```{r}
+sanc_text <- md_att_sanc |>
+  select(text) |>
+  unnest_tokens(word, text) |>
+  count(word, sort = TRUE)
+
+sanc_text |>
+  anti_join(stop_words)
+```
+
+**Q2.** Let's move beyond single words to phrases. Make a list of the top 10 three-word phrases, called trigrams, based on the example from the pre_lab (you'll need to modify the example code to do this). What's the top trigram and how often does it appear? What does that phrase mean in legal terms?
+
+**A2.** 
+
+```{r}
+```
+
+**Q3.** Let's drop back down to more traditional text analysis - take the top trigram from Q2 and write code to see how many times it occurs in the text column in each fiscal year. What do you think the answer produced by your code suggests? What else could you do to try and clarify the most important reasons attorneys get sanctioned?
+
+**A3.** 
+
+```{r}
+```
